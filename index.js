@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 "use strict";
 
+const chunkSorter = require("./libs/chunkSorter");
+
 function GenerateIncludesWebpackPlugin() {}
 
 GenerateIncludesWebpackPlugin.prototype.apply = function(compiler) {
   compiler.plugin("emit", function(compilation, callback) {
     let head = "";
     let body = "";
+    const sortedChunks = chunkSorter(compilation.chunks);
 
     let publicPath = compilation.mainTemplate.getPublicPath({
       hash: compilation.hash
@@ -15,7 +18,7 @@ GenerateIncludesWebpackPlugin.prototype.apply = function(compiler) {
       publicPath += "/";
     }
 
-    for (const chunk of compilation.chunks) {
+    for (const chunk of sortedChunks) {
       if (chunk.name) {
         for (const filename of chunk.files) {
           if (filename.match(/\.css$/)) {
